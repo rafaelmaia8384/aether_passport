@@ -8,11 +8,17 @@ import 'src/oauth.dart'
 abstract class Passport {
   Passport._();
 
-  static Future<TokenResponse> authenticate(
-      {required Uri uri,
-      required String clientId,
-      List<String>? scopes}) async {
-    return oauth.authentication(uri, clientId, scopes ?? const []);
+  static Future<TokenResponse> authenticate({
+    required Uri uri,
+    required String clientId,
+    List<String>? scopes,
+    bool? forceWebPopup,
+  }) async {
+    return oauth.authentication(
+      uri,
+      clientId,
+      scopes ?? const [],
+    );
   }
 
   static Future logout({
@@ -24,7 +30,11 @@ abstract class Passport {
       throw new UnimplementedError(
           'Define idTokenString for mobile logout or redirectString for web logout.');
     }
-    await oauth.logout(uri, idTokenString, redirectString);
+    await oauth.logout(
+      uri,
+      idTokenString,
+      redirectString,
+    );
   }
 }
 

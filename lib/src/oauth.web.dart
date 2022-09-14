@@ -13,7 +13,10 @@ Future _launchURL(String url) async {
 }
 
 Future<TokenResponse> authentication(
-    Uri uri, String clientId, List<String> scopes) async {
+  Uri uri,
+  String clientId,
+  List<String> scopes,
+) async {
   // create the client
   var issuer = await Issuer.discover(uri);
   var client = Client(issuer, clientId);
@@ -24,7 +27,6 @@ Future<TokenResponse> authentication(
   // Our current app URL
   final currentUri = Uri.base;
 
-// Generate the URL redirection to our static.html page
   final redirectUri = Uri(
     host: currentUri.host,
     scheme: currentUri.scheme,
@@ -41,7 +43,7 @@ Future<TokenResponse> authentication(
     // starts the authentication
     //html.window.sessionStorage.remove("aether_passport:url");
     return await authenticator
-        .authorizeWithPopup(); // this will redirect the browser
+        .authorizeWithPopup(); // this will not redirect the browser
   } else {
     // return the user info
     return await c.getTokenResponse();
@@ -53,6 +55,9 @@ Future logout(
   _,
   String? redirectString,
 ) async {
+  //Forget credentials
+  html.window.localStorage.remove('openid_client:state');
+  html.window.localStorage.remove('openid_client:auth');
   String redirect = uri.toString() +
       '/protocol/openid-connect/logout?redirect_uri=$redirectString';
   String encodedRedirectUri = Uri.encodeComponent(redirect);
@@ -70,7 +75,10 @@ extension AetherAuthenticatorExtensions on Authenticator {
     int popupHeight = 640,
     int popupWidth = 480,
   }) async {
-    _forgetCredentials();
+    //Forget credentials
+    html.window.localStorage.remove('openid_client:state');
+    html.window.localStorage.remove('openid_client:auth');
+    //Set flow state
     html.window.localStorage['openid_client:state'] = flow.state;
 
     final top = (html.window.outerHeight - popupHeight) / 2 +
@@ -102,10 +110,5 @@ extension AetherAuthenticatorExtensions on Authenticator {
     });
 
     return await c.future;
-  }
-
-  void _forgetCredentials() {
-    html.window.localStorage.remove('openid_client:state');
-    html.window.localStorage.remove('openid_client:auth');
   }
 }

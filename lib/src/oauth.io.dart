@@ -5,7 +5,10 @@ import 'package:openid_client/openid_client_io.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<TokenResponse> authentication(
-    Uri uri, String clientId, List<String> scopes) async {
+  Uri uri,
+  String clientId,
+  List<String> scopes,
+) async {
   // create the client
   var issuer = await Issuer.discover(uri);
   var client = Client(issuer, clientId);
